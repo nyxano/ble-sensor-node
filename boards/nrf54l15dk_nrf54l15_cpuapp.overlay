@@ -1,0 +1,2 @@
+/ { aliases { led0 = &led1; }; };
+
