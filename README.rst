@@ -1,97 +1,28 @@
-.. zephyr:code-sample:: blinky
-   :name: Blinky
-   :relevant-api: gpio_interface
+# ble-sensor-node
 
-   Blink an LED forever using the GPIO API.
+Battery-powered BLE environmental sensor node on the nRF54L15 DK, built with Zephyr RTOS (nRF Connect SDK).
 
-Overview
-********
+## Goal
 
-The Blinky sample blinks an LED forever using the :ref:`GPIO API <gpio_api>`.
+Read temperature and humidity from an SHT30 over I2C using a driver written from the datasheet, and expose the data over BLE through a custom GATT service with notifications.
 
-The source code shows how to:
+## Setup
 
-#. Get a pin specification from the :ref:`devicetree <dt-guide>` as a
-   :c:struct:`gpio_dt_spec`
-#. Configure the GPIO pin as an output
-#. Toggle the pin forever
+- Board: nRF54L15 DK (`nrf54l15dk/nrf54l15/cpuapp`, revision: <z naklejki na płytce>)
+- SDK: nRF Connect SDK v3.4.2 LTS
+- Sensor: SHT30 (I2C, address 0x44)
+- Tooling: VS Code with the nRF Connect extension
 
-See :zephyr:code-sample:`pwm-blinky` for a similar sample that uses the PWM API instead.
+## Status
 
-.. _blinky-sample-requirements:
+- [x] Environment, build and flash (blinky)
+- [x] Devicetree overlay: `led0` alias redirected to `led1`
+- [ ] SHT30 I2C node in Devicetree and own driver
+- [ ] Unit tests (Twister / ZTest)
+- [ ] BLE advertising and custom GATT service
 
-Requirements
-************
+#Notes and Sugestions
 
-Your board must:
-
-#. Have an LED connected via a GPIO pin (these are called "User LEDs" on many of
-   Zephyr's :ref:`boards`).
-#. Have the LED configured using the ``led0`` devicetree alias.
-
-Building and Running
-********************
-
-Build and flash Blinky as follows, changing ``reel_board`` for your board:
-
-.. zephyr-app-commands::
-   :zephyr-app: samples/basic/blinky
-   :board: reel_board
-   :goals: build flash
-   :compact:
-
-After flashing, the LED starts to blink and messages with the current LED state
-are printed on the console. If a runtime error occurs, the sample exits without
-printing to the console.
-
-Build errors
-************
-
-You will see a build error at the source code line defining the ``struct
-gpio_dt_spec led`` variable if you try to build Blinky for an unsupported
-board.
-
-On GCC-based toolchains, the error looks like this:
-
-.. code-block:: none
-
-   error: '__device_dts_ord_DT_N_ALIAS_led_P_gpios_IDX_0_PH_ORD' undeclared here (not in a function)
-
-Adding board support
-********************
-
-To add support for your board, add something like this to your devicetree:
-
-.. code-block:: DTS
-
-   / {
-   	aliases {
-   		led0 = &myled0;
-   	};
-
-   	leds {
-   		compatible = "gpio-leds";
-   		myled0: led_0 {
-   			gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
-                };
-   	};
-   };
-
-The above sets your board's ``led0`` alias to use pin 13 on GPIO controller
-``gpio0``. The pin flags :c:macro:`GPIO_ACTIVE_LOW` mean the LED is on when
-the pin is set to its low state, and off when the pin is in its high state.
-
-Tips:
-
-- See :dtcompatible:`gpio-leds` for more information on defining GPIO-based LEDs
-  in devicetree.
-
-- If you're not sure what to do, check the devicetrees for supported boards which
-  use the same SoC as your target. See :ref:`get-devicetree-outputs` for details.
-
-- See :zephyr_file:`include/zephyr/dt-bindings/gpio/gpio.h` for the flags you can use
-  in devicetree.
-
-- If the LED is built in to your board hardware, the alias should be defined in
-  your :ref:`BOARD.dts file <devicetree-in-out-files>`. Otherwise, you can
-  define one in a :ref:`devicetree overlay <set-devicetree-overlays>`.
+In Zephyr, C code looks up hardware through a devicetree alias, e.g. `DT_ALIAS(led0)`. 
+A node label is the name of a specific node in the devicetree (e.g. `led1`), used in `.dts` files and overlays. 
+The board file maps `led0` to the `led0` node by default; my overlay redirects the `led0` alias to the `led1` node, so the LED changes without touching `main.c`.
