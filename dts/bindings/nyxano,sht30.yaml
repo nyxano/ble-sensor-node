@@ -1,0 +1,5 @@
+description: SHT30 temperature and humidity sensor (own driver)
+
+compatible: "nyxano,sht30"
+
+include: i2c-device.yaml
