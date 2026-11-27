@@ -19,7 +19,7 @@ Read temperature and humidity from an SHT30 over I2C using a driver written from
 - VS Code with the nRF Connect extension
 - Custom devicetree binding for the sensor (`dts/bindings/nyxano,sht30.yaml`)
 - Own CRC-8 implementation (polynomial 0x31, init 0xFF), verified against the datasheet test vector (0xBEEF gives 0x92)
-
+- Measurement loop: one reading per second, integer math (values in hundredths of °C and %RH), frame rejected if CRC does not match
 ## Project layout
 
 | Path | Purpose |
@@ -41,7 +41,7 @@ Read temperature and humidity from an SHT30 over I2C using a driver written from
 - [x] Devicetree overlay: `led0` alias redirected to `led1`
 - [x] SHT30 node on `i2c22` with own binding, ACK confirmed (soft reset)
 - [x] CRC-8 with datasheet test vector
-- [ ] Temperature and humidity read (single shot, CRC check, conversion)
+- [x] Temperature and humidity read (single shot, CRC check, conversion)
 - [ ] Sensor code split into `sht30.c` / `sht30.h`
 - [ ] Unit tests (Twister / ZTest)
 - [ ] BLE advertising and custom GATT service
